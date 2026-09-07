@@ -19,7 +19,11 @@
     pulse: 0, // 학습 순간 반짝임
   };
 
-  const target = (a, b) => (S.rule === "AND" ? (a && b ? 1 : 0) : (a || b ? 1 : 0));
+  const target = (a, b) => {
+    if (S.rule === "AND") return a && b ? 1 : 0;
+    if (S.rule === "OR") return a || b ? 1 : 0;
+    return a !== b ? 1 : 0; // XOR: 뉴런 하나로는 배울 수 없는 규칙 (직선 하나로 나눌 수 없음)
+  };
   const raw = (a, b) => S.wa * a + S.wb * b + S.bias;
   const predict = (a, b) => (raw(a, b) > 0 ? 1 : 0);
 
@@ -58,7 +62,8 @@
   function updateReadout() {
     setK("wa", S.wa.toFixed(2));
     setK("wb", S.wb.toFixed(2));
-    setK("bias", S.bias.toFixed(2));
+    // 화면엔 '문턱값'을 보여준다. 내부 bias는 문턱의 음수(합 + bias > 0 ⇔ 합 > 문턱)이므로 부호를 뒤집는다.
+    setK("thr", (-S.bias).toFixed(2));
     const out = predict(S.inA, S.inB);
     setK("out", out ? "예 (발화)" : "아니오");
     setK("acc", Math.round(S.acc * 100) + "%");
@@ -160,7 +165,7 @@
     // 문턱값 표시
     ctx.font = "400 11px 'IBM Plex Mono', monospace";
     ctx.fillStyle = "#7c7a72";
-    ctx.fillText("문턱 " + S.dbias.toFixed(2), ox, oy + rOut + 22);
+    ctx.fillText("문턱 " + (-S.dbias).toFixed(2), ox, oy + rOut + 22);
 
     requestAnimationFrame(draw);
   }
@@ -188,15 +193,19 @@
 
   document.getElementById("neuronStep").addEventListener("click", trainStep);
 
-  let autoTimer = null;
+  let autoTimer = null, autoSteps = 0;
   const autoBtn = document.getElementById("neuronAuto");
   autoBtn.addEventListener("click", () => {
     if (autoTimer) { stopAuto(); return; }
     autoBtn.textContent = "정지 ■"; autoBtn.classList.add("running");
+    autoSteps = 0;
     autoTimer = setInterval(() => {
       trainStep();
+      autoSteps++;
       if (S.acc === 1) { // 정답에 도달하면 몇 번 더 돌고 멈춤
         setTimeout(stopAuto, 600);
+      } else if (autoSteps >= 120) { // XOR처럼 수렴하지 않는 규칙은 충분히 돌린 뒤 멈춤
+        stopAuto();
       }
     }, 260);
   });
