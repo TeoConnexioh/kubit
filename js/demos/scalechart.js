@@ -9,7 +9,7 @@
   const host = document.getElementById("scaleChart");
   if (!host) return;
 
-  // 가중치 수 (개). MoE 모델은 전체 가중치 수.
+  // 파라미터 수 (개). MoE 모델은 전체 파라미터 수.
   const PARAMS = [
     { name: "GPT-1", t: 2018.45, v: 1.17e8 },
     { name: "BERT-Large", t: 2018.8, v: 3.4e8 },
@@ -158,7 +158,7 @@
 
   const H = 690;
   const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "공개된 언어 모델의 가중치 수와 학습 토큰 수를 연도별로 표시한 로그 축 차트" });
-  panel(svg, { top: 0, height: 380, data: PARAMS, yMin: 1e8, yMax: 1e13, title: "가중치(파라미터) 수 (세로축 한 칸 = 10배)", unit: "가중치", strip: true });
+  panel(svg, { top: 0, height: 380, data: PARAMS, yMin: 1e8, yMax: 1e13, title: "파라미터 수 (세로축 한 칸 = 10배)", unit: "파라미터", strip: true });
   panel(svg, { top: 400, height: 290, data: TOKENS, yMin: 1e11, yMax: 1e14, title: "학습에 읽은 글의 양, 토큰 수", unit: "토큰", strip: false });
   host.insertBefore(svg, tip);
 
@@ -170,6 +170,6 @@
       return `<tr><td>${p.name}</td><td>${fmtYear(p.t)}</td><td>${fmtKo(p.v)}</td><td>${tk ? fmtKo(tk.v) : "<span class='na'>미공개</span>"}</td></tr>`;
     }).join("");
     const hid = UNDISCLOSED.map((u) => `<tr><td>${u.name}</td><td>${fmtYear(u.t)}</td><td class="na">비공개</td><td class="na">비공개</td></tr>`).join("");
-    table.innerHTML = `<thead><tr><th>모델</th><th>발표</th><th>가중치(파라미터) 수</th><th>학습 토큰</th></tr></thead><tbody>${rows}${hid}</tbody>`;
+    table.innerHTML = `<thead><tr><th>모델</th><th>발표</th><th>파라미터 수</th><th>학습 토큰</th></tr></thead><tbody>${rows}${hid}</tbody>`;
   }
 })();
