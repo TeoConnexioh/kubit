@@ -234,6 +234,14 @@
           <path d="M258,150 C210,120 200,96 190,52 M178,80 L172,58 M206,86 L214,66" />
         </g>
 
+        <!-- 들어오는 시냅스: 다른 뉴런의 축삭 말단이 수상돌기 끝에 닿는 자리 -->
+        <g stroke="#f2b544" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7">
+          <path d="M52,66 L28,50" /><path d="M42,120 L14,116" /><path d="M50,255 L24,268" /><path d="M120,300 L104,322" /><path d="M190,52 L186,26" />
+        </g>
+        <g fill="#f2b544" opacity="0.95">
+          <circle cx="52" cy="66" r="5.5" /><circle cx="42" cy="120" r="5.5" /><circle cx="50" cy="255" r="5.5" /><circle cx="120" cy="300" r="5.5" /><circle cx="190" cy="52" r="5.5" />
+        </g>
+
         <!-- 축삭 (미엘린 수초 포함) -->
         <line x1="288" y1="165" x2="628" y2="165" stroke="#a8792a" stroke-width="7" stroke-linecap="round" />
         <g fill="#f2b544" opacity="0.92">
@@ -270,26 +278,30 @@
 
         <!-- 라벨 -->
         <g class="bio-label">
-          <text x="96" y="40">수상돌기</text>
-          <text x="96" y="56" class="sub">신호를 받는 안테나</text>
+          <text x="230" y="30">수상돌기</text>
+          <text x="230" y="46" class="sub">신호를 받는 안테나</text>
+          <text x="10" y="176">시냅스 (들어오는 쪽)</text>
+          <text x="10" y="192" class="sub">연결의 세기 = 이 뉴런의 가중치</text>
           <text x="250" y="245" text-anchor="middle">세포체</text>
           <text x="250" y="261" text-anchor="middle" class="sub">신호를 모아 판단</text>
           <text x="455" y="132" text-anchor="middle">축삭</text>
           <text x="455" y="148" text-anchor="middle" class="sub">신호를 전달</text>
-          <text x="712" y="240" text-anchor="middle">시냅스</text>
-          <text x="712" y="256" text-anchor="middle" class="sub">연결의 세기 = 가중치</text>
+          <text x="712" y="240" text-anchor="middle">시냅스 (나가는 쪽)</text>
+          <text x="712" y="256" text-anchor="middle" class="sub">다음 뉴런의 가중치가 된다</text>
         </g>
       </svg>
       <figcaption>
-        뇌 속 뉴런 하나의 구조입니다. <strong>수상돌기</strong>로 신호를 받아 <strong>세포체</strong>에서 합치고,
-        합이 충분히 크면 <strong>축삭</strong>을 타고 전기 신호가 '발화'해 <strong>시냅스</strong>를 거쳐 다음 뉴런으로 넘어갑니다.
-        학습이란 이 시냅스의 <em>연결 세기</em>가 바뀌는 일입니다.
+        뇌 속 뉴런 하나의 구조입니다. 다른 뉴런들이 <strong>수상돌기</strong> 끝의 시냅스로 신호를 건네고, <strong>세포체</strong>가 이를 합쳐
+        합이 충분히 크면 <strong>축삭</strong>을 타고 전기 신호가 '발화'해 다음 뉴런으로 넘어갑니다.
+        아래 데모의 가중치에 해당하는 것은 <em>들어오는 쪽</em> 시냅스의 세기이고, 학습이란 이 세기가 바뀌는 일입니다.
+        실제 뉴런은 이런 입력을 수천 개 받습니다. 인공 뉴런은 1943년에 이 구조를 극단적으로 단순화한 것으로,
+        출발점이 된 비유일 뿐 이후의 신경망은 생물학과 따로 발전했습니다.
       </figcaption>
 
       <!-- 생물학적 ↔ 기계 매핑 -->
       <div class="bio-map">
         <div><span class="bio-map-bio">수상돌기</span><span class="bio-map-arrow">→</span><span class="bio-map-cs">입력 (A, B)</span></div>
-        <div><span class="bio-map-bio">시냅스 세기</span><span class="bio-map-arrow">→</span><span class="bio-map-cs">가중치 (weight)</span></div>
+        <div><span class="bio-map-bio">들어오는 시냅스 세기</span><span class="bio-map-arrow">→</span><span class="bio-map-cs">가중치 (weight)</span></div>
         <div><span class="bio-map-bio">세포체 · 문턱</span><span class="bio-map-arrow">→</span><span class="bio-map-cs">합산 · 문턱값</span></div>
         <div><span class="bio-map-bio">축삭 발화</span><span class="bio-map-arrow">→</span><span class="bio-map-cs">출력 (예/아니오)</span></div>
       </div>
