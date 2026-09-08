@@ -14,6 +14,10 @@
 />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0c12'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='%23f2b544' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%2355d6c4'/%3E%3C/svg%3E" />
 <link rel="stylesheet" href="css/style.css" />
+<script>
+  // 발표 모드 결정 (깜빡임 방지를 위해 스타일 적용 전에 실행)
+  (function(){var q=new URLSearchParams(location.search).get("mode");var wide=window.innerWidth>=900;var present=q==="present"||(q!=="scroll"&&wide);if(present)document.documentElement.classList.add("present");})();
+</script>
 </head>
 <body>
 
@@ -115,6 +119,7 @@
     </div>
 
     <!-- 집합 모형: 포함 관계 지도 -->
+<div class="slide-group">
     <div class="setmap-head">
       <h3>한 장으로 보는 지도, 무엇이 무엇을 품고 있나</h3>
       <p>
@@ -158,6 +163,7 @@
         </div>
       </aside>
     </div>
+</div>
 
     <p class="bridge">
       그렇다면 기계는 <span class="latin">어떻게</span> 스스로 규칙을 찾을까요?
@@ -186,7 +192,8 @@
       </p>
       <p>
         기계에서는 이 연결의 세기를 <strong>가중치(weight)</strong>라는 숫자 하나로 표현합니다.
-        입력마다 가중치를 곱해 더하고, 그 합이 <strong>문턱값</strong>을 넘으면 뉴런이 "예"라고 답합니다.
+        뉴스에서 "파라미터 1,750억 개"라고 할 때의 <strong>파라미터</strong>가 바로 이 가중치입니다.
+        이 강의에서는 가중치라고 부르겠습니다. 입력마다 가중치를 곱해 더하고, 그 합이 <strong>문턱값</strong>을 넘으면 뉴런이 "예"라고 답합니다.
         학습이란 이 가중치와 문턱값을 정답에 가까워지도록 조금씩 고쳐 가는 일입니다.
         아래에서 <strong>뉴런 하나</strong>가 규칙을 배우는 과정을 지켜보세요.
       </p>
@@ -496,7 +503,7 @@
         강아지에게 '손'을 가르칠 때 정답 사진을 보여 주지는 않습니다.
         잘하면 간식을 주고, 못하면 반응하지 않습니다. 강아지는 <strong>보상을 가장 많이 받는 행동</strong>을
         시행착오로 알아냅니다. 이것이 강화학습입니다.
-        알파고가 스스로와 대국하며 실력을 끌어올린 방식이고, 로봇이 걷는 법을 배우는 방식이며,
+        알파고가 사람 기보로 기초를 배운 뒤 스스로와 대국하며 실력을 끌어올린 방식이고, 로봇이 걷는 법을 배우는 방식이며,
         챕터 06에서 보듯 LLM의 말투를 다듬는 데도 쓰입니다.
       </p>
       <p>
@@ -759,8 +766,14 @@
         트랜스포머도 이와 같이, 각 단어가 문장의 <strong>어떤 단어에 얼마나 주목해야 하는지</strong>를 데이터에서 학습합니다.
       </p>
       <p>
+        그 전에 한 가지, 신경망은 글자를 읽지 못합니다. 그래서 단어마다 <strong>숫자 수백 개의 묶음</strong>을 배정하는데
+        이 묶음을 <strong>벡터</strong>, 배정하는 과정을 <strong>임베딩</strong>이라고 부릅니다.
+        학습이 끝나면 뜻이 비슷한 단어의 벡터는 서로 가까운 값이 됩니다. '고양이'와 '강아지'는 가깝고 '고양이'와 '세금'은 멀어지는 식입니다.
+        이 강의에서 "단어의 숫자"라고 부르는 것이 이 벡터입니다.
+      </p>
+      <p>
         그럼 각 단어가 '누구에게 주목할지'는 어떻게 정해질까요?
-        트랜스포머는 단어마다 <strong>질문(Query)</strong>과 <strong>이름표(Key)</strong>, 그리고 <strong>정보(Value)</strong>를 만듭니다.
+        트랜스포머는 단어의 벡터에 가중치를 곱해 <strong>질문(Query)</strong>과 <strong>이름표(Key)</strong>, 그리고 <strong>정보(Value)</strong>를 만듭니다.
         한 단어의 질문을 다른 단어들의 이름표와 하나씩 맞춰 보고, 잘 맞는 짝일수록 강하게 주목합니다.
         그리고 주목한 비율대로 상대의 정보를 가져와 자기 뜻을 새로 채웁니다.
       </p>
@@ -775,7 +788,7 @@
       </figcaption>
       <div class="qkv-wrap">
         <div class="qkv-origin">
-          <span class="qo-item token">단어의 숫자</span>
+          <span class="qo-item token">단어의 숫자(벡터)</span>
           <span class="qo-arrow">→</span>
           <span class="qo-item net">
             <svg class="nrn-glyph" viewBox="0 0 28 20" aria-hidden="true"><g stroke="rgba(111,220,160,0.6)" stroke-width="1" fill="none"><line x1="6" y1="6" x2="22" y2="4"/><line x1="6" y1="6" x2="22" y2="10"/><line x1="6" y1="6" x2="22" y2="16"/><line x1="6" y1="14" x2="22" y2="4"/><line x1="6" y1="14" x2="22" y2="10"/><line x1="6" y1="14" x2="22" y2="16"/></g><g fill="#55d6c4"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="14" r="2.4"/></g><g fill="#6fdca0"><circle cx="22" cy="4" r="2.4"/><circle cx="22" cy="10" r="2.4"/><circle cx="22" cy="16" r="2.4"/></g></svg>
@@ -940,8 +953,9 @@
       <span class="chapter-no">06</span>
       <h2>LLM, 이 모든 것의 합</h2>
       <p class="lead">
-        LLM(대규모 언어 모델)에 새로운 원리는 거의 없습니다.
-        지금까지 본 조각들을 <strong>엄청난 규모로</strong> 쌓아 올리고, 몇 단계의 훈련을 거친 결과물입니다.
+        요즘 <strong>생성형 AI</strong>라고 부르는 ChatGPT·Claude·Gemini의 심장이 LLM(대규모 언어 모델)입니다.
+        여기에 새로운 원리는 거의 없습니다. 지금까지 본 조각들을 <strong>엄청난 규모로</strong> 쌓아 올리고,
+        몇 단계의 훈련을 거친 결과물입니다. 그림이나 음성을 만드는 생성형 AI도 같은 뼈대 위에 있습니다.
       </p>
     </div>
 
@@ -990,6 +1004,7 @@
       </div>
     </div>
 
+<div class="slide-group">
     <div class="prose">
       <p>
         정리하면, LLM은 <strong>"인터넷만큼의 글을 읽으며 다음 단어 맞히기를 연습한,
@@ -1006,15 +1021,18 @@
       "다음 단어를 잘 맞히려면, 결국 세상이 어떻게 돌아가는지
       조금은 알아야 한다."
     </blockquote>
+</div>
 
     <!-- 숫자로 보는 규모 -->
     <div class="scale-box">
+<div class="slide-group">
       <div class="ft-head">
         <span class="ft-tag">참고 · 숫자로 보는 규모</span>
-        <h3>가중치 몇 개, 글 몇 자를 읽은 것일까</h3>
+        <h3>파라미터 몇 개, 글 몇 자를 읽은 것일까</h3>
         <p>
           위에서 "수천억 개의 가중치", "인터넷 규모의 글"이라고 했는데, 실제 숫자를 보면 감이 다릅니다.
-          아래는 만든 회사가 <strong>공식 발표한 값</strong>만 적은 것입니다. ChatGPT와 Claude를 포함해
+          기사에 나오는 "파라미터 수"가 곧 가중치 수입니다.
+          아래는 만든 회사가 <strong>공식 발표한 값</strong>만 적은 것입니다. ChatGPT·Claude·Gemini를 포함해
           2026년 현재 주요 상용 모델의 최신 버전은 크기를 공개하지 않으므로 비공개로 표시했습니다.
           바깥에 떠도는 추정치는 확인된 것이 아니어서 넣지 않았습니다.
         </p>
@@ -1022,7 +1040,7 @@
       <div class="cmp-table-wrap" style="margin-top:0">
         <table class="cmp-table">
           <thead>
-            <tr><th>모델</th><th>발표</th><th>가중치 수</th><th>학습에 읽은 글(토큰)</th><th>비고</th></tr>
+            <tr><th>모델</th><th>발표</th><th>가중치(파라미터) 수</th><th>학습에 읽은 글(토큰)</th><th>비고</th></tr>
           </thead>
           <tbody>
             <tr>
@@ -1038,6 +1056,10 @@
               <td>Anthropic도 크기를 공개하지 않음</td>
             </tr>
             <tr>
+              <td>Gemini 계열</td><td>2023~</td><td class="na">비공개</td><td class="na">비공개</td>
+              <td>Google도 공개하지 않음. 2022년의 PaLM(5,400억)이 마지막으로 크기를 밝힌 전작</td>
+            </tr>
+            <tr>
               <td>Llama 3.1 405B</td><td>2024</td><td>4,050억</td><td>약 15조</td>
               <td>Meta가 가중치를 통째로 공개한 모델. GPU 1만 6천 장, 약 3,900만 GPU 시간</td>
             </tr>
@@ -1049,6 +1071,7 @@
         </table>
       </div>
 
+</div>
       <figure class="sc-fig">
         <div class="sc-head">
           <span>연도별로 보면</span>
@@ -1070,10 +1093,11 @@
         <figcaption>
           두 가지가 보입니다. 공개 모델의 가중치는 2020년 무렵부터 수천억에서 1조 개 사이에 머무는데, 학습 토큰은 같은 기간에도
           3,000억에서 30조가 넘게 <strong>100배</strong> 늘었습니다. 크기를 더 키우는 것보다 <em>더 많은 글을 읽히는</em> 쪽으로 무게가 옮겨 간 것입니다.
-          그리고 정작 가장 많이 쓰이는 ChatGPT와 Claude의 크기는 아무도 모릅니다. 위쪽 띠의 빈 동그라미가 그 사실을 나타냅니다.
+          그리고 정작 가장 많이 쓰이는 ChatGPT·Claude·Gemini의 크기는 아무도 모릅니다. 위쪽 띠의 빈 동그라미가 그 사실을 나타냅니다.
         </figcaption>
       </figure>
 
+<div class="slide-group">
       <div class="scale-facts">
         <div class="scale-fact">
           <b>책 약 1억 권</b>
@@ -1095,6 +1119,7 @@
         학습에 드는 계산은 더 아득합니다. Llama 3.1 405B 한 번 훈련에 쓴 GPU 시간 3,900만 시간은 GPU 한 장으로 4,400년이 걸리는 양이고,
         이런 훈련을 회사들은 매년 몇 차례씩 반복합니다. 챕터 07에서 비용과 에너지를 한계로 꼽는 이유입니다.
       </p>
+</div>
     </div>
 
     <!-- 추가 학습: 미세조정과 LoRA -->
@@ -1179,6 +1204,7 @@
         </p>
       </div>
 
+<div class="slide-group">
       <div class="ft-head ft-head-mid">
         <span class="ft-tag">원리</span>
         <h3>왜 이런 일이 가능한가</h3>
@@ -1209,8 +1235,8 @@
           <span class="ft-num">3</span>
           <h4>그래도 전체를 고치기엔 비싸다</h4>
           <p>
-            가중치 수천억 개를 전부 고치려면 가중치마다 기울기와 조정 이력을 함께 저장해야 해서
-            모델 크기의 서너 배 메모리가 필요합니다. 사례 4의 16GB 모델이면 60GB 안팎입니다.
+            가중치 수천억 개를 전부 고치려면 가중치마다 기울기와 조정 이력 두 벌을 함께 저장해야 해서
+            모델 파일의 네 배에서 여덟 배 메모리가 필요합니다. 사례 4의 16GB 모델이면 100GB 안팎입니다.
             용도마다 16GB짜리 복사본을 하나씩 두어야 하는 것도 부담입니다.
           </p>
         </article>
@@ -1226,6 +1252,7 @@
         </article>
       </div>
 
+</div>
       <figure class="lora-fig">
         <svg viewBox="0 0 640 220" role="img" aria-label="LoRA 개념도: 얼린 원본 가중치 W에 작은 행렬 A와 B의 곱을 더한다">
           <rect x="30" y="30" width="160" height="160" rx="8" fill="rgba(85,214,196,0.08)" stroke="#55d6c4" stroke-width="1.6" stroke-dasharray="6 4"/>
@@ -1401,8 +1428,8 @@
     <div class="limits-grid">
       <article class="limit-card">
         <span class="limit-ico">🌀</span>
-        <h4>환각, 자신 있게 지어낸다</h4>
-        <p>그럴듯하지만 사실이 아닌 내용을 태연히 말합니다. LLM이 훈련받은 목표는 '진실'이 아니라 '<strong>다음에 올 법한 단어</strong>'입니다. 그래서 모르는 것을 물어도 확률이 높은 문장을 매끄럽게 만들어 냅니다.</p>
+        <h4>환각(할루시네이션), 자신 있게 지어낸다</h4>
+        <p>그럴듯하지만 사실이 아닌 내용을 태연히 말합니다. LLM이 훈련받은 목표는 '진실'이 아니라 '<strong>다음에 올 법한 단어</strong>'입니다. 그래서 모르는 것을 물어도 확률이 높은 문장을 매끄럽게 만들어 냅니다. 고장이 아니라 목표 자체에서 나오는 성질이라, 줄일 수는 있어도 0으로 만들 수는 없습니다.</p>
         <a class="limit-from" href="#transformer" data-nav>← 다음 단어 예측(5-C)에서 비롯</a>
       </article>
       <article class="limit-card">
@@ -1470,5 +1497,6 @@
 <script src="js/setmap.js"></script>
 <script src="js/hero.js"></script>
 <script src="js/main.js"></script>
+<script src="js/present.js"></script>
 </body>
 </html>

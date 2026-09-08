@@ -1134,3 +1134,126 @@ main { position: relative; z-index: 1; }
 .sc-details summary:hover { color: var(--ink-soft); }
 .sc-table { margin-top: 10px; }
 .sc-fig figcaption { margin-top: 16px; color: var(--ink-soft); font-size: 0.93rem; line-height: 1.7; }
+
+/* ============================================================
+   발표 모드 (html.present) — 슬라이드 · 조각 · HUD
+   ============================================================ */
+.present-toggle {
+  position: fixed; top: 18px; right: 22px; z-index: 60;
+  font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.08em;
+  color: var(--ink); background: rgba(20,24,36,0.85); border: 1px solid var(--line-strong);
+  border-radius: 100px; padding: 8px 14px; cursor: pointer; backdrop-filter: blur(8px);
+}
+.present-toggle:hover { border-color: var(--amber); color: var(--amber); }
+.hud { display: none; }
+
+html.present { font-size: 17.5px; }
+html.present, html.present body { overflow: hidden; height: 100%; }
+html.present .present-toggle, html.present .scroll-progress, html.present .scroll-hint,
+html.present .bridge, html.present .recap { display: none; }
+html.present .chapter { max-width: none; padding: 0; margin: 0; border: 0; }
+html.present .finetune, html.present .incontext, html.present .scale-box { margin: 0; padding: 0; border: 0; max-width: none; }
+
+/* 슬라이드 */
+html.present .slide {
+  position: fixed; inset: 0; z-index: 1;
+  display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden;
+  padding: 5vh max(5vw, calc((100vw - 1240px) / 2)) 78px;
+  visibility: hidden; opacity: 0; transform: translateY(28px) scale(0.985);
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.2,0.8,0.2,1), visibility 0s linear 0.55s;
+  pointer-events: none;
+}
+html.present .slide.active {
+  visibility: visible; opacity: 1; transform: none; pointer-events: auto; z-index: 2;
+  transition: opacity 0.6s ease 0.08s, transform 0.6s cubic-bezier(0.2,0.8,0.2,1) 0.08s, visibility 0s;
+}
+html.present .slide.past { transform: translateY(-20px) scale(0.985); }
+html.present .slide > * { width: 100%; margin: auto; }
+html.present .slide > .prose, html.present .slide > .aside-note, html.present .slide > .stack { max-width: 940px; }
+html.present .slide > .prose p { font-size: 1.28rem; line-height: 1.8; margin-bottom: 26px; }
+html.present .slide > .aside-note p { font-size: 1.08rem; }
+html.present .slide > .ft-case { max-width: 980px; }
+html.present .slide > .ft-case p { font-size: 1.08rem; }
+html.present .slide > .ft-prose p { font-size: 1.12rem; }
+html.present .slide > .mystery p, html.present .slide > .limits-close p { font-size: 1.08rem; }
+
+/* 제목 슬라이드 */
+html.present .slide-title { padding-left: max(8vw, calc((100vw - 1100px) / 2)); }
+html.present .slide-title > .chapter-head { max-width: 1000px; margin: auto 0 auto 0; position: relative; }
+html.present .slide-title .chapter-no {
+  position: absolute; left: -0.06em; top: -0.55em; font-family: var(--font-display);
+  font-size: clamp(8rem, 22vw, 17rem); letter-spacing: -0.04em; line-height: 1;
+  color: var(--amber); opacity: 0.09; pointer-events: none; margin: 0;
+}
+html.present .slide-title h2 { font-size: clamp(2.8rem, 6vw, 4.6rem); position: relative; }
+html.present .slide-title .lead { font-size: clamp(1.25rem, 2.2vw, 1.7rem); margin-top: 30px; max-width: 900px; }
+html.present .slide-title > .hero { min-height: 100%; }
+html.present .slide.slide-title > .hero { margin: 0; width: 100%; }
+html.present #hero.hero { position: absolute; inset: 0; }
+
+/* 조각: 흐리게 → 선명하게 */
+html.present .fragment {
+  opacity: 0.14; transform: translateY(8px); filter: saturate(0.6);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2,0.8,0.2,1), filter 0.5s ease;
+}
+html.present .fragment.shown { opacity: 1; transform: none; filter: none; }
+html.present .pipe-flow .pipe-arrow { opacity: 0.14; transition: opacity 0.5s ease; }
+html.present .pipe-flow .pipe-step.shown + .pipe-arrow { opacity: 1; }
+html.present .reveal { opacity: 1; transform: none; }
+html.present .reveal.fragment:not(.shown) { opacity: 0.14; transform: translateY(8px); }
+html.present .stack-item:hover { transform: none; }
+
+/* 데모 슬라이드는 여백을 조금 줄여 크게 */
+html.present .slide-demo { padding-top: 3vh; }
+html.present .slide-demo > .demo { max-width: 1240px; }
+
+/* HUD */
+html.present .hud {
+  display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  background: linear-gradient(180deg, rgba(10,12,18,0) 0%, rgba(10,12,18,0.85) 40%);
+  padding: 18px 26px 14px;
+}
+html.present .hud-progress { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: rgba(226,232,255,0.08); }
+html.present .hud-progress span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), var(--amber)); transition: width 0.4s ease; }
+html.present .hud-row { display: flex; align-items: center; gap: 18px; font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.1em; color: var(--ink-mute); }
+html.present .hud-chapter { color: var(--amber); }
+html.present .hud-count { margin-left: auto; }
+html.present .hud-btns { display: inline-flex; gap: 6px; }
+html.present .hud-btns button {
+  font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-soft);
+  background: rgba(20,24,36,0.8); border: 1px solid var(--line); border-radius: 8px;
+  min-width: 34px; height: 30px; padding: 0 10px; cursor: pointer;
+}
+html.present .hud-btns button:hover { border-color: var(--amber); color: var(--amber); }
+html.present .chapter-nav { z-index: 55; }
+
+@media (max-width: 899px) {
+  .present-toggle { display: none; }
+}
+
+/* 발표 모드 · 데모 슬라이드를 한 화면에 맞추기 */
+html.present h1, html.present h2, html.present h3, html.present h4 { word-break: keep-all; }
+html.present .slide-demo .demo figcaption { padding: 16px 24px 12px; }
+html.present .slide-demo .demo figcaption h4 { font-size: 1.3rem; margin-bottom: 6px; }
+html.present .slide-demo .demo figcaption p { font-size: 0.9rem; line-height: 1.55; max-width: 900px; }
+html.present .slide-demo .demo-tag { margin-bottom: 8px; padding: 3px 10px; }
+html.present .slide-demo .demo-note { padding: 12px 24px; font-size: 0.9rem; }
+html.present .demo-stage canvas { height: min(440px, 48vh); }
+html.present #dqnMaze { height: min(360px, 40vh); }
+html.present #dqnNetCanvas { min-height: min(320px, 36vh); }
+html.present .attn-grid .hcell { height: min(40px, 4.2vh); }
+html.present .qkv-wrap, html.present .next-wrap, html.present .icl-wrap { padding: 18px 26px 22px; }
+html.present .qkv-caveat, html.present .demo figcaption p.qkv-caveat { font-size: 0.86rem; padding: 10px 14px; margin-top: 10px; }
+html.present .qkv-picker { margin-bottom: 14px; }
+html.present .sc-head p { font-size: 0.9rem; margin-bottom: 12px; }
+html.present .sc-chart svg { max-height: 56vh; width: auto; max-width: 100%; margin: 0 auto; }
+html.present .sc-fig figcaption { font-size: 0.88rem; margin-top: 10px; }
+html.present .slide > .sc-fig { max-width: 1100px; }
+html.present .lora-fig svg { max-height: 40vh; width: auto; margin: 0 auto; }
+html.present .pipeline .pipe-step p { font-size: 0.88rem; }
+html.present .rl-brain-note p { font-size: 0.98rem; }
+html.present #dqnMaze { height: min(330px, 37vh); }
+html.present #dqnNetCanvas { min-height: min(290px, 32vh); }
+html.present .attn-wrap { padding-top: 40px; padding-bottom: 14px; }
+html.present .attn-grid .hcell { height: min(34px, 3.6vh); min-height: 0; }
+html.present .attn-heatmap { padding-top: 12px; }

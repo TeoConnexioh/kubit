@@ -48,8 +48,9 @@
     { name: "Claude 2", t: 2023.55 },
     { name: "Claude 3", t: 2024.2 },
     { name: "GPT-4o", t: 2024.4 },
+    { name: "Gemini 2.5", t: 2025.2, dx: -7, anchor: "end" },
     { name: "Claude 4", t: 2025.4 },
-    { name: "GPT-5", t: 2025.6 },
+    { name: "GPT-5", t: 2025.6, dx: 7, anchor: "start" },
   ];
 
   const C_PUBLIC = "#bd8222";   // 공개 모델 (검증된 다크 모드 단계)
@@ -127,7 +128,7 @@
         g.appendChild(el("circle", { cx: x, cy: sy, r: 12, fill: "transparent" }));
         g.appendChild(el("circle", { cx: x, cy: sy, r: 5, fill: "#0a0c12", stroke: C_HIDDEN, "stroke-width": 2 }));
         const ly = i % 2 === 0 ? sy - 13 : sy + 20;
-        g.appendChild(el("text", { x, y: ly, "text-anchor": "middle", class: "sc-lab sc-lab-hidden" }, d.name));
+        g.appendChild(el("text", { x: x + (d.dx || 0), y: ly, "text-anchor": d.anchor || "middle", class: "sc-lab sc-lab-hidden" }, d.name));
         g.addEventListener("mousemove", (e) => showTip(`<b>${d.name}</b><span>${fmtYear(d.t)} 발표</span><span>가중치·학습 데이터 규모 비공개</span>`, e));
         g.addEventListener("mouseleave", hideTip);
         svg.appendChild(g);
@@ -157,7 +158,7 @@
 
   const H = 690;
   const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "공개된 언어 모델의 가중치 수와 학습 토큰 수를 연도별로 표시한 로그 축 차트" });
-  panel(svg, { top: 0, height: 380, data: PARAMS, yMin: 1e8, yMax: 1e13, title: "가중치 수 (세로축 한 칸 = 10배)", unit: "가중치", strip: true });
+  panel(svg, { top: 0, height: 380, data: PARAMS, yMin: 1e8, yMax: 1e13, title: "가중치(파라미터) 수 (세로축 한 칸 = 10배)", unit: "가중치", strip: true });
   panel(svg, { top: 400, height: 290, data: TOKENS, yMin: 1e11, yMax: 1e14, title: "학습에 읽은 글의 양, 토큰 수", unit: "토큰", strip: false });
   host.insertBefore(svg, tip);
 
@@ -169,6 +170,6 @@
       return `<tr><td>${p.name}</td><td>${fmtYear(p.t)}</td><td>${fmtKo(p.v)}</td><td>${tk ? fmtKo(tk.v) : "<span class='na'>미공개</span>"}</td></tr>`;
     }).join("");
     const hid = UNDISCLOSED.map((u) => `<tr><td>${u.name}</td><td>${fmtYear(u.t)}</td><td class="na">비공개</td><td class="na">비공개</td></tr>`).join("");
-    table.innerHTML = `<thead><tr><th>모델</th><th>발표</th><th>가중치 수</th><th>학습 토큰</th></tr></thead><tbody>${rows}${hid}</tbody>`;
+    table.innerHTML = `<thead><tr><th>모델</th><th>발표</th><th>가중치(파라미터) 수</th><th>학습 토큰</th></tr></thead><tbody>${rows}${hid}</tbody>`;
   }
 })();
