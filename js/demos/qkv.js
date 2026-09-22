@@ -1,7 +1,7 @@
 /* ============================================================
    데모 5-A — 어텐션 작동 원리 (Query · Key · Value)
-   각 단어가 던지는 '질문(Query)'과 다른 단어의 '이름표(Key)'가
-   맞는 정도로 '주목도'가 정해진다. 그 주목도로 '정보(Value)'를 섞는다.
+   각 토큰의 Q 벡터와 다른 토큰의 K 벡터를 비교해 주목도를 계산한다.
+   화면의 질문 문장과 특징 이름은 사람이 붙인 설명용 비유다.
    개념 전달을 위해 직접 설계한 작은 특징 벡터로 계산.
    ============================================================ */
 (function () {
@@ -50,7 +50,10 @@
 
   function select(i) {
     sel = i;
-    chips.forEach((c, k) => c.classList.toggle("sel", k === i));
+    chips.forEach((chip, index) => {
+      chip.classList.toggle("sel", index === i);
+      chip.setAttribute("aria-pressed", String(index === i));
+    });
     const wi = tokens[i], qi = Q[wi];
 
     // 다른 단어와의 매칭 점수
@@ -61,10 +64,10 @@
     const sum = exps.reduce((a, b) => a + b, 0) || 1;
     const attn = exps.map((e) => e / sum);
 
-    // 질문 카드
     queryEl.innerHTML =
-      `<span class="qkv-cardtag">질문 · Query</span>` +
-      `<div class="qkv-cardbody"><b>${wi}</b><span>“${queryText[wi]}”</span></div>`;
+      `<span class="qkv-cardtag">비교 기준 · Query</span>` +
+      `<div class="qkv-cardbody"><b>${wi}</b><code class="qkv-vector">Q = [${qi.join(", ")}]</code>` +
+      `<span class="qkv-analogy">설명용 비유: “${queryText[wi]}”</span></div>`;
 
     // 행들
     let topJ = -1, topA = -1;
@@ -77,16 +80,16 @@
       const w = Math.max(3, (scores[j] / maxScore) * 100);
       row.innerHTML =
         `<span class="qkv-word">${wj}</span>` +
-        `<span class="qkv-key">🏷 ${keyLabel[wj]}</span>` +
+        `<span class="qkv-key">K · ${keyLabel[wj]}</span>` +
         `<span class="qkv-bar"><span style="width:${w.toFixed(0)}%"></span></span>` +
         `<span class="qkv-pct">${Math.round(attn[j] * 100)}%</span>`;
       rowsEl.appendChild(row);
     });
 
     explainEl.innerHTML =
-      `<b>${wi}</b>의 질문에는 <b class="hl">${tokens[topJ]}</b>의 이름표가 가장 잘 맞습니다 ` +
-      `(<b>${Math.round(topA * 100)}%</b>). 트랜스포머는 이 비율대로 각 단어의 ` +
-      `<strong>정보(Value)</strong>를 섞어 <b>${wi}</b>의 의미를 새로 채웁니다.`;
+      `이 예시에서는 <b>${wi}</b>의 Q와 <b class="hl">${tokens[topJ]}</b>의 K가 가장 잘 맞아 ` +
+      `주목도가 <b>${Math.round(topA * 100)}%</b>로 가장 높습니다. ` +
+      `실제 트랜스포머는 이렇게 정한 비율대로 <strong>V(Value)의 정보를 섞습니다.</strong>`;
   }
 
   select(4);

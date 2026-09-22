@@ -146,6 +146,7 @@
   document.addEventListener("keydown", (e) => {
     const t = e.target;
     if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+    if (t && t.closest("button, a, select, summary") && (e.key === " " || e.key === "Enter")) return;
     if (e.key === "p" || e.key === "P") { isPresent() ? exitPresent() : enterPresent(currentScrollBlock()); return; }
     if (!isPresent()) return;
     switch (e.key) {

@@ -719,6 +719,8 @@ main { position: relative; z-index: 1; }
 .qkv-cardbody { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .qkv-cardbody b { font-family: var(--font-display); font-size: 1.3rem; color: var(--amber); }
 .qkv-cardbody span { color: var(--ink-soft); font-size: 0.98rem; }
+.qkv-vector { font-family: var(--font-mono); font-size: 0.92rem; color: var(--amber); overflow-wrap: anywhere; }
+.qkv-cardbody .qkv-analogy { flex-basis: 100%; font-size: 0.86rem; line-height: 1.6; }
 .qkv-rows { display: flex; flex-direction: column; gap: 9px; margin-bottom: 18px; }
 .qkv-row {
   display: grid; grid-template-columns: 84px 108px 1fr 46px; align-items: center; gap: 12px;
@@ -1245,6 +1247,17 @@ html.present .attn-grid .hcell { height: min(40px, 4.2vh); }
 html.present .qkv-wrap, html.present .next-wrap, html.present .icl-wrap { padding: 18px 26px 22px; }
 html.present .qkv-caveat, html.present .demo figcaption p.qkv-caveat { font-size: 0.86rem; padding: 10px 14px; margin-top: 10px; }
 html.present .qkv-picker { margin-bottom: 14px; }
+@media (min-width: 1100px) {
+  html.present #demo-qkv .qkv-wrap { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 14px 24px; align-items: start; }
+  html.present #demo-qkv .qkv-origin,
+  html.present #demo-qkv .qkv-caveat,
+  html.present #demo-qkv .qkv-picker { grid-column: 1 / -1; margin: 0; }
+  html.present #demo-qkv .qkv-query { grid-column: 1; grid-row: 4; margin: 0; align-items: flex-start; }
+  html.present #demo-qkv .qkv-rows { grid-column: 2; grid-row: 4 / span 2; margin: 0; gap: 8px; }
+  html.present #demo-qkv .qkv-row { grid-template-columns: 76px 112px 1fr 42px; gap: 8px; padding: 7px 12px; }
+  html.present #demo-qkv .qkv-key { white-space: nowrap; }
+  html.present #demo-qkv .qkv-explain { grid-column: 1; grid-row: 5; }
+}
 html.present .sc-head p { font-size: 0.9rem; margin-bottom: 12px; }
 html.present .sc-chart svg { max-height: 56vh; width: auto; max-width: 100%; margin: 0 auto; }
 html.present .sc-fig figcaption { font-size: 0.88rem; margin-top: 10px; }
@@ -1257,3 +1270,48 @@ html.present #dqnNetCanvas { min-height: min(290px, 32vh); }
 html.present .attn-wrap { padding-top: 40px; padding-bottom: 14px; }
 html.present .attn-grid .hcell { height: min(34px, 3.6vh); min-height: 0; }
 html.present .attn-heatmap { padding-top: 12px; }
+
+#demo-neuron .demo-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
+.neuron-view { display: flex; flex-direction: column; justify-content: center; background: var(--bg); min-width: 0; }
+.neuron-view-label { margin: 16px 16px 0; color: var(--cyan); font-size: 0.85rem; text-align: center; }
+#demo-neuron canvas { border: 0; height: 320px; }
+#neuronReadout { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0 18px 18px; }
+#neuronReadout > div { padding: 10px; }
+#demo-neuron .demo-controls { padding: 18px 22px; gap: 14px; min-width: 0; }
+.neuron-step + .neuron-step { border-top: 1px solid var(--line-strong); padding-top: 12px; }
+.neuron-step h5 { display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 1rem; margin: 0 0 8px; }
+.neuron-step h5 > span { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: var(--bg); background: var(--cyan); font-family: var(--font-mono); font-size: 0.8rem; }
+.neuron-step:last-child h5 > span { background: var(--amber); }
+.neuron-help, .neuron-score { margin: 6px 0 0; font-size: 0.78rem; color: var(--ink-soft); line-height: 1.55; }
+.neuron-score strong { color: var(--cyan); }
+.neuron-examples { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: center; margin-bottom: 10px; }
+.neuron-examples caption { text-align: left; color: var(--ink-soft); font-size: 0.78rem; margin-bottom: 6px; }
+.neuron-examples th { font-weight: 400; color: var(--ink-soft); }
+.neuron-examples th, .neuron-examples td { padding: 3px 8px; border-bottom: 1px solid var(--line); }
+.neuron-examples tr.is-training { outline: 1px solid var(--amber); outline-offset: -1px; background: rgba(242,181,68,0.08); }
+#demo-neuron [data-correct="true"] { color: var(--good); }
+#demo-neuron [data-correct="false"] { color: var(--bad); }
+#demo-neuron .btn { font-size: 0.8rem; padding: 8px; }
+#demo-neuron .ctrl-row.buttons { gap: 6px; }
+#demo-neuron .toggle { padding: 8px 12px; }
+.neuron-feedback { min-height: 2.9em; margin: 8px 0 0; font-size: 0.8rem; line-height: 1.45; color: var(--ink-soft); }
+.neuron-result { font-size: 0.9rem; margin: 8px 0 0; }
+.neuron-result > span { margin-left: 6px; font-size: 0.8rem; }
+.reference-video { margin-top: 18px; }
+.reference-video a { display: inline-block; padding: 8px 0; text-underline-offset: 4px; }
+.reference-video span { color: var(--ink-soft); font-size: 0.85em; }
+.reference-video a:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; }
+#demo-neuron button:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+html.present #demo-neuron canvas { height: min(320px, 34vh); }
+html.present #demo-neuron .demo-controls { padding: 12px 20px; gap: 10px; }
+html.present #demo-neuron .neuron-step + .neuron-step { padding-top: 9px; }
+html.present #demo-neuron .neuron-step h5 { line-height: 1.3; margin-bottom: 6px; }
+html.present #neuronRule button { padding: 5px 8px; }
+html.present .neuron-examples { line-height: 1.4; margin-bottom: 8px; }
+html.present .neuron-examples th, html.present .neuron-examples td { padding: 2px 8px; }
+html.present .neuron-examples caption { line-height: 1.4; margin-bottom: 4px; }
+@media (max-width: 780px) {
+  #demo-neuron .demo-stage { grid-template-columns: minmax(0, 1fr); }
+  #demo-neuron .demo-controls { order: -1; padding: 18px 14px; }
+  #demo-neuron canvas { height: 250px; }
+}

@@ -33,31 +33,51 @@
     return ok / 4;
   }
 
-  // 무작위 표본 하나로 퍼셉트론 갱신
   let sampleIdx = 0;
+  let lastExample = null;
   const samples = [[0, 0], [0, 1], [1, 0], [1, 1]];
   function trainStep() {
-    const [a, b] = samples[sampleIdx % 4];
+    const exampleIndex = sampleIdx % samples.length;
+    const [inputA, inputB] = samples[exampleIndex];
+    const answer = predict(inputA, inputB);
+    const expected = target(inputA, inputB);
+    const error = expected - answer;
+    lastExample = { exampleIndex, inputA, inputB, answer, expected, error };
     sampleIdx++;
-    const err = target(a, b) - predict(a, b);
-    S.wa += S.lr * err * a;
-    S.wb += S.lr * err * b;
-    S.bias += S.lr * err;
+    S.wa += S.lr * error * inputA;
+    S.wb += S.lr * error * inputB;
+    S.bias += S.lr * error;
     S.acc = accuracy();
-    S.pulse = 1;
+    S.pulse = error ? 1 : 0;
     updateReadout();
   }
 
   function reset() {
-    S.wa = (Math.sin(sampleIdx * 12.9) * 0.4); // 살짝 무작위한 초기값 (Math.random 미사용)
-    S.wb = (Math.cos(sampleIdx * 7.7) * 0.4);
+    sampleIdx = 0;
+    lastExample = null;
+    S.wa = 0;
+    S.wb = 0.4;
     S.bias = 0.1;
+    S.pulse = 0;
     S.acc = accuracy();
     updateReadout();
   }
 
   // --- 판독부 ---
-  const readout = document.getElementById("neuronReadout");
+  const readout = document.getElementById("demo-neuron");
+  const trainingStatus = document.getElementById("neuronTraining");
+  const exampleRows = samples.map(([inputA, inputB]) => {
+    const row = document.createElement("tr");
+    const cells = [inputA, inputB, "", ""].map((value) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      row.appendChild(cell);
+      return cell;
+    });
+    document.getElementById("neuronExamples").appendChild(row);
+    return { row, cells };
+  });
+  const answerText = (value) => value ? "예" : "아니오";
   const setK = (k, v) => { const el = readout.querySelector(`[data-k="${k}"]`); if (el) el.textContent = v; };
   function updateReadout() {
     setK("wa", S.wa.toFixed(2));
@@ -65,8 +85,29 @@
     // 화면엔 '문턱값'을 보여준다. 내부 bias는 문턱의 음수(합 + bias > 0 ⇔ 합 > 문턱)이므로 부호를 뒤집는다.
     setK("thr", (-S.bias).toFixed(2));
     const out = predict(S.inA, S.inB);
-    setK("out", out ? "예 (발화)" : "아니오");
-    setK("acc", Math.round(S.acc * 100) + "%");
+    const expected = target(S.inA, S.inB);
+    setK("out", answerText(out));
+    setK("expected", answerText(expected));
+    setK("match", out === expected ? "일치" : "불일치");
+    readout.querySelector('[data-k="match"]').dataset.correct = String(out === expected);
+    setK("acc", `${Math.round(S.acc * 4)} / 4개 정답`);
+    exampleRows.forEach(({ row, cells }, index) => {
+      const [inputA, inputB] = samples[index];
+      const prediction = predict(inputA, inputB);
+      const correct = prediction === target(inputA, inputB);
+      cells[2].textContent = answerText(target(inputA, inputB));
+      cells[3].textContent = `${answerText(prediction)} ${correct ? "✓" : "✕"}`;
+      cells[3].dataset.correct = String(correct);
+      row.classList.toggle("is-training", lastExample?.exampleIndex === index);
+    });
+    if (lastExample) {
+      const { inputA, inputB, answer, expected, error } = lastExample;
+      trainingStatus.textContent = `${sampleIdx}번째 예제 (${inputA}, ${inputB}): 학습 전 답 ${answerText(answer)}, 정답 ${answerText(expected)}. ${error ? "틀려서 가중치·문턱값을 조정했습니다." : "맞아서 숫자를 유지했습니다."}`;
+      if (S.acc === 1) trainingStatus.textContent += " 네 예제를 모두 맞혔습니다.";
+      else if (sampleIdx >= 120 && S.rule === "XOR") trainingStatus.textContent += " XOR은 뉴런 하나로 모두 맞힐 수 없습니다.";
+    } else {
+      trainingStatus.textContent = "아직 학습 전입니다. '예제 1개 학습'을 눌러 보세요.";
+    }
     const el = readout.querySelector('[data-k="out"]');
     if (el) el.style.color = out ? "var(--amber)" : "var(--ink-mute)";
     const accEl = readout.querySelector('[data-k="acc"]');
@@ -177,42 +218,44 @@
     btn.classList.toggle("on", val === 1);
     btn.classList.toggle("off", val === 0);
     btn.querySelector("b").textContent = val;
+    btn.dataset.on = val;
+    btn.setAttribute("aria-pressed", String(val === 1));
   }
   inABtn.addEventListener("click", () => { S.inA = S.inA ? 0 : 1; refreshToggle(inABtn, S.inA); updateReadout(); });
   inBBtn.addEventListener("click", () => { S.inB = S.inB ? 0 : 1; refreshToggle(inBBtn, S.inB); updateReadout(); });
 
-  document.querySelectorAll("#neuronRule button").forEach((b) => {
-    b.addEventListener("click", () => {
-      document.querySelectorAll("#neuronRule button").forEach((x) => x.classList.remove("active"));
-      b.classList.add("active");
-      S.rule = b.dataset.rule;
-      S.acc = accuracy();
-      updateReadout();
+  document.querySelectorAll("#neuronRule button").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (S.rule === button.dataset.rule) return;
+      stopAuto();
+      document.querySelectorAll("#neuronRule button").forEach((option) => {
+        option.classList.toggle("active", option === button);
+        option.setAttribute("aria-pressed", String(option === button));
+      });
+      S.rule = button.dataset.rule;
+      reset();
     });
   });
 
-  document.getElementById("neuronStep").addEventListener("click", trainStep);
+  document.getElementById("neuronStep").addEventListener("click", () => { stopAuto(); trainStep(); });
 
   let autoTimer = null, autoSteps = 0;
   const autoBtn = document.getElementById("neuronAuto");
   autoBtn.addEventListener("click", () => {
     if (autoTimer) { stopAuto(); return; }
+    if (S.acc === 1) return;
     autoBtn.textContent = "정지 ■"; autoBtn.classList.add("running");
     autoSteps = 0;
     autoTimer = setInterval(() => {
       trainStep();
       autoSteps++;
-      if (S.acc === 1) { // 정답에 도달하면 몇 번 더 돌고 멈춤
-        setTimeout(stopAuto, 600);
-      } else if (autoSteps >= 120) { // XOR처럼 수렴하지 않는 규칙은 충분히 돌린 뒤 멈춤
-        stopAuto();
-      }
-    }, 260);
+      if (S.acc === 1 || autoSteps >= 120) stopAuto();
+    }, 400);
   });
   function stopAuto() {
     if (autoTimer) clearInterval(autoTimer);
     autoTimer = null;
-    autoBtn.textContent = "자동 학습 ▶"; autoBtn.classList.remove("running");
+    autoBtn.textContent = "반복 학습 ▶"; autoBtn.classList.remove("running");
   }
 
   document.getElementById("neuronReset").addEventListener("click", () => { stopAuto(); reset(); });
